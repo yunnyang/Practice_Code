@@ -7,44 +7,21 @@
 #         self.val = x
 #         self.left = None
 #         self.right = None
+class Solution(object):
+    def findDuplicateSubtrees(self, root):
+        trees = collections.defaultdict()
+        trees.default_factory = trees.__len__
+        count = collections.Counter()
+        ans = []
 
-class Solution:
-    def findDuplicateSubtrees(self, root: TreeNode) -> List[TreeNode]:
-        stack = collections.deque()
-        visited = []
-        dupleTree = []
-        stack.append(root)
+        def lookup(node):
+            if node:
+                uid = trees[node.val, lookup(node.left), lookup(node.right)]
 
-        while stack:
-            target = stack.pop()
-            visited.append(target)
-            if target.right != None and target.right:
-                stack.append(target.right)
+                count[uid] += 1
+                if count[uid] == 2:
+                    ans.append(node)
+                return uid
 
-            if target.left != None and target.left:
-                stack.append(target.left)
-
-        for i in range(len(visited)):
-            for j in range(i + 1, len(visited)):
-                if self.isSameTree(visited[i], visited[j]):
-                    print(i, j)
-                    dupleTree.append(visited[i])
-
-        return dupleTree
-
-    def isSameTree(self, p, q):
-        """
-        :type p: TreeNode
-        :type q: TreeNode
-        :rtype: bool
-        """
-        # p and q are both None
-        if not p and not q:
-            return True
-        # one of p and q is None
-        if not q or not p:
-            return False
-        if p.val != q.val:
-            return False
-        return self.isSameTree(p.right, q.right) and \
-               self.isSameTree(p.left, q.left)
+        lookup(root)
+        return ans
